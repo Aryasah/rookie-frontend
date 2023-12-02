@@ -2,6 +2,8 @@ import { Socket } from "socket.io-client";
 
 class GameService {
   private timer: NodeJS.Timeout | null = null;
+  private remainingTimer: NodeJS.Timeout | null = null;
+  private remainingTime: number = 30;
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
     return new Promise((rs, rj) => {
       socket.emit("join_game", { roomId });
@@ -18,6 +20,7 @@ class GameService {
           this.startTimer(socket, 30, () => {
             this.onTimerEnd(socket);
           }); // Start the timer when the game starts
+          this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update when the game starts
         }
       });
     });
@@ -27,13 +30,13 @@ class GameService {
     durationSeconds: number,
     onTimeout: () => void
   ) {
-    let remainingTime = durationSeconds;
+    this.remainingTime = durationSeconds;
 
     this.timer = setInterval(() => {
-      remainingTime--;
-      console.log("remainingTime", remainingTime);
+      this.remainingTime--;
+      console.log("remainingTime",this.remainingTime);
 
-      if (remainingTime <= 0) {
+      if (this.remainingTime <= 0) {
         // this.stopTimer();
         onTimeout(); // Call the provided callback when the timer ends
       }
@@ -50,6 +53,7 @@ class GameService {
   public async updateGame(socket: Socket, gameMatrix: any) {
     socket.emit("update_game", { matrix: gameMatrix });
     this.stopTimer(); // Reset the timer on each game update
+    this.stopThrottlingOpponentTimeUpdate() // Stop throttling the opponent time update on each game update
   }
   public async gameWin(socket: Socket, message: string) {
     socket.emit("game_win", { message });
@@ -60,6 +64,7 @@ class GameService {
       this.startTimer(socket, 30, () => {
         this.onTimerEnd(socket);
       }); // Restart the timer on each game update
+      this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update on each game update
       listener(matrix);
     });
   }
@@ -89,15 +94,22 @@ class GameService {
   }
   public async throttleOpponentTimeUpdate(socket: Socket) {
     // Throttle the opponent time update to every 5 seconds
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
+    if (this.remainingTimer) {
+      clearInterval(this.remainingTimer);
+      this.remainingTimer = null;
     }
 
-    this.timer = setInterval(() => {
+    this.remainingTimer = setInterval(() => {
+      console.log("emitting opponent_time_update",this.remainingTime);
       // Emit the remaining time to the opponent
-      socket.emit("opponent_time_update", { remainingTime: 30 });
+      socket.emit("opponent_time_update", { remainingTime: this.remainingTime });
     }, 5000);
+  }
+  public async stopThrottlingOpponentTimeUpdate() {
+    if (this.remainingTimer) {
+      clearInterval(this.remainingTimer);
+      this.remainingTimer = null;
+    }
   }
 
   public async onOpponentRemainingTimeUpdate(
