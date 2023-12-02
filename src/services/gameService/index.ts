@@ -32,6 +32,27 @@ class GameService {
       });
     });
   }
+  public async createGameRoom(socket: Socket): Promise<boolean> {
+    return new Promise((rs, rj) => {
+      socket.emit("create_game");
+      socket.on("room_created", ({roomId}) => rs(roomId));
+      socket.on("room_create_error", ({ error }: { error: string }) => {
+        rj(error);
+      });
+
+      // Listen for the "start_game" event to start the timer
+      socket.on("start_game", (options: any) => {
+        const { start, symbol } = options;
+
+        if (start) {
+          this.startTimer(socket, 10, () => {
+            this.onTimerEnd(socket);
+          }); // Start the timer when the game starts
+          this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update when the game starts
+        }
+      });
+    });
+  }
   public async startTimer(
     socket: Socket,
     durationSeconds: number,
