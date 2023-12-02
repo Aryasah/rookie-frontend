@@ -3,13 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import gameContext from "../../gameContext";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
-
-// const GameContainer = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   font-family: "Zen Tokyo Zoo", cursive;
-//   position: relative;
-// `;
+import { isValidMove, useResetGame } from "../../utility";
 
 export function Game() {
   const {
@@ -19,10 +13,12 @@ export function Game() {
     isPlayerTurn,
     setGameStarted,
     isGameStarted,
+    rookPostion,
     setRookPosition,
     remainingTime,
     setRemainingTime,
   } = useContext(gameContext);
+  const { resetGame } = useResetGame();
 
   const [row, setRow] = useState(0);
   const [column, setColumn] = useState(0);
@@ -43,10 +39,13 @@ export function Game() {
       }
       return [false, true];
     }
-    return [false, true];
+    return [false, false];
   };
 
   const updateGameMatrix = (column: number, row: number, symbol: "x" | "o") => {
+    if (!isPlayerTurn) return alert("Not your turn!");
+    if (!isValidMove(rookPostion.x, rookPostion.y, row, column))
+      return alert("Invalid Move!");
     if (socketService.socket) {
       gameService.updateGame(socketService.socket, {
         rookPosition: { x: column, y: row },
@@ -58,12 +57,15 @@ export function Game() {
         symbol,
       });
       if (currentPlayerWon && otherPlayerWon) {
-        gameService.gameWin(socketService.socket, "The Game is a TIE!");
-        alert("The Game is a TIE!");
+        // game continues
       } else if (currentPlayerWon && !otherPlayerWon) {
         gameService.gameWin(socketService.socket, "You Lost!");
         alert("You Won!");
       }
+      // else{
+      //   gameService.gameWin(socketService.socket, "You Won!");
+      //   alert("You Lost!");
+      // }
       setPlayerTurn(false);
     }
   };
@@ -93,9 +95,13 @@ export function Game() {
   const handleGameWin = () => {
     if (socketService.socket)
       gameService.onGameWin(socketService.socket, (message: string) => {
-        console.log("Here", message);
+        console.log("Here gameWin", message);
         setPlayerTurn(false);
         alert(message);
+        // resetGame();
+        if(socketService?.socket)
+        socketService.socket.disconnect();
+        window.location.reload();
       });
   };
 
@@ -109,12 +115,15 @@ export function Game() {
         }
       );
   };
+
   useEffect(() => {
     handleGameUpdate();
     handleGameStart();
     handleGameWin();
     handleOpponentRemainingTimeUpdate();
     return () => {
+      gameService.stopThrottlingOpponentTimeUpdate();
+      gameService.stopTimer();
       if (socketService.socket) {
         socketService.socket.off("gameUpdate");
         socketService.socket.off("startGame");
