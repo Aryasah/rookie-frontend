@@ -99,10 +99,29 @@ export function Game() {
       });
   };
 
+  const handleOpponentRemainingTimeUpdate = () => {
+    if (socketService.socket)
+      gameService.onOpponentRemainingTimeUpdate(
+        socketService.socket,
+        (time: number) => {
+          console.log("Remaining Time", time);
+          setRemainingTime(time);
+        }
+      );
+  };
   useEffect(() => {
     handleGameUpdate();
     handleGameStart();
     handleGameWin();
+    handleOpponentRemainingTimeUpdate();
+    return () => {
+      if (socketService.socket) {
+        socketService.socket.off("gameUpdate");
+        socketService.socket.off("startGame");
+        socketService.socket.off("gameWin");
+        socketService.socket.off("opponentRemainingTimeUpdate");
+      }
+    };
   }, []);
 
   return (
