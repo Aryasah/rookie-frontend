@@ -5,8 +5,6 @@ import socketService from "../../services/socketService";
 
 interface IJoinRoomProps {}
 
-
-
 export function JoinRoom(props: IJoinRoomProps) {
   const [roomName, setRoomName] = useState("");
   const [isJoining, setJoining] = useState(false);
@@ -36,21 +34,46 @@ export function JoinRoom(props: IJoinRoomProps) {
 
     setJoining(false);
   };
+  const createRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const socket = socketService.socket;
+    if (!socket) return;
+
+    setJoining(true);
+
+    const roomId = await gameService.createGameRoom(socket).catch((err) => {
+      alert(err);
+    });
+    console.log("roomId: ", roomId)
+    if (roomId !== null) setInRoom(true);
+
+    setJoining(false);
+  };
 
   return (
     <>
       {!isInRoom && (
-        <form onSubmit={joinRoom}>
-          <input
-            type="text"
-            placeholder="Room name"
-            value={roomName}
-            onChange={handleRoomNameChange}
-          />
-          <button type="submit" disabled={isJoining}>
-            Join
-          </button>
-        </form>
+        <>
+          <h1>Join Room</h1>
+          <form onSubmit={joinRoom}>
+            <input
+              type="text"
+              placeholder="Room Name"
+              value={roomName}
+              onChange={handleRoomNameChange}
+            />
+            <button type="submit" disabled={isJoining}>
+              Join Room
+            </button>
+          </form>
+          <h2>Create Room</h2>
+          <form onSubmit={createRoom}>
+            <button type="submit" disabled={isJoining}>
+              Create Room
+            </button>
+          </form>
+        </>
       )}
     </>
   );

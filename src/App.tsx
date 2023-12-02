@@ -4,6 +4,7 @@ import GameContext, { IGameContextProps } from "./gameContext";
 import socketService from "./services/socketService";
 import { JoinRoom } from "./components/joinRoom";
 import { Game } from "./components/game";
+import GameComponent from "./components/game/canvasComponent";
 
 // const AppContainer = styled.div`
 //   width: 100%;
@@ -74,6 +75,7 @@ function App() {
       <Game /> */}
       {!isInRoom && <JoinRoom />}
       {isInRoom && <Game />}
+      <GameComponent />
     </GameContext.Provider>
   );
 }
