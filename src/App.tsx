@@ -33,6 +33,7 @@ function App() {
   const [isPlayerTurn, setPlayerTurn] = useState(false);
   const [isGameStarted, setGameStarted] = useState(false);
   const [rookPostion, setRookPosition] = useState({x: 0, y: 0});
+  const [remainingTime, setRemainingTime] = useState(0);
 
   const connectSocket = async () => {
     const socket = await socketService
@@ -46,6 +47,7 @@ function App() {
     connectSocket();
   }, []);
 
+
   const gameContextValue: IGameContextProps = {
     isInRoom,
     setInRoom,
@@ -56,7 +58,9 @@ function App() {
     isGameStarted,
     setGameStarted,
     rookPostion,
-    setRookPosition
+    setRookPosition,
+    remainingTime: remainingTime,
+    setRemainingTime: setRemainingTime,
   };
 
   return (

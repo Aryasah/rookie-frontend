@@ -20,6 +20,8 @@ export function Game() {
     setGameStarted,
     isGameStarted,
     setRookPosition,
+    remainingTime,
+    setRemainingTime,
   } = useContext(gameContext);
 
   const [row, setRow] = useState(0);
@@ -78,7 +80,7 @@ export function Game() {
 
   const handleGameStart = () => {
     if (socketService.socket)
-      gameService.onStartGame(socketService.socket, 0, (options: any) => {
+      gameService.onStartGame(socketService.socket, 30, (options: any) => {
         const { message } = options; // Extract the 'message' property from 'options'
         console.log("Here handleGameStart", message);
         setGameStarted(true);
@@ -110,6 +112,8 @@ export function Game() {
       )}
       {isGameStarted && (
         <>
+          <h2>Game Started!</h2>
+          <h2>Remaining Time: {remainingTime}</h2>
           <form onSubmit={handleSubmit}>
             <label>
               Row:

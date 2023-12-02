@@ -11,6 +11,8 @@ export interface IGameContextProps {
   setPlayerTurn: (turn: boolean) => void;
   isGameStarted: boolean;
   setGameStarted: (started: boolean) => void;
+  remainingTime: number;
+  setRemainingTime: (time: number) => void;
 }
 
 const defaultState: IGameContextProps = {
@@ -24,6 +26,8 @@ const defaultState: IGameContextProps = {
   setPlayerTurn: () => {},
   isGameStarted: false,
   setGameStarted: () => {},
+  remainingTime: 30,
+  setRemainingTime: () => {},
 };
 
 export default React.createContext(defaultState);
