@@ -51,13 +51,13 @@ const gameSlice = createSlice({
   
         if (socketService.socket) {
           gameService.updateGame(socketService.socket, {
-            rookPosition: { x: column, y: row },
+            rookPosition: { y: column, x: row },
             symbol,
           });
   
           const [currentPlayerWon, otherPlayerWon] = checkGameState({
-            x: column,
-            y: row,
+            y: column,
+            x: row,
             symbol,
           }, symbol);
   

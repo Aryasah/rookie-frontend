@@ -1,8 +1,8 @@
 // Import necessary modules and components
 import "phaser";
-// import store from "../Services/store";
-// import { updateGameState } from "../Services/gameSlice";
 import { toast } from 'react-toastify';
+import store from "../../redux/store";
+import { updateGameState } from "../../redux/gameSlice";
 
 // Define the Game class extending Phaser.Scene
 export class Game extends Phaser.Scene {
@@ -48,7 +48,7 @@ export class Game extends Phaser.Scene {
           const clickedRow = Math.floor(pointer.y / this.squareSize);
           const clickedCol = Math.floor(pointer.x / this.squareSize);
           if (this.isRookMoving === false) {
-            // this.handleClick({ clickedRow, clickedCol });
+            this.handleClick({ clickedRow, clickedCol });
           }
         });
         this.squares[row][col] = square;
@@ -65,7 +65,7 @@ export class Game extends Phaser.Scene {
 
     // Highlight valid paths and subscribe to store updates
     this.highlightValidPaths();
-    // store.subscribe(this.handleStateUpdate);
+    store.subscribe(this.handleStateUpdate);
   }
 
   // Highlight valid paths for the rook movement
@@ -108,106 +108,106 @@ export class Game extends Phaser.Scene {
   }
 
   // Handle state updates from the store
-//   private handleStateUpdate = () => {
-//     const gameState = store.getState().game;
+  private handleStateUpdate = () => {
+    const gameState = store.getState().game;
 
-//     // Check if rook position has changed
-//     if (
-//       gameState.rookRow !== this.rookStartRow ||
-//       gameState.rookCol !== this.rookStartCol
-//     ) {
-//       const newRow = gameState.rookRow;
-//       const newCol = gameState.rookCol;
-//       const x = newCol * this.squareSize + 28;
-//       const y = newRow * this.squareSize + 30;
+    // Check if rook position has changed
+    if (
+      gameState.rookPosition.x !== this.rookStartRow ||
+      gameState.rookPosition.y !== this.rookStartCol
+    ) {
+      const newRow = gameState.rookPosition.x;
+      const newCol = gameState.rookPosition.y;
+      const x = newCol * this.squareSize + 28;
+      const y = newRow * this.squareSize + 30;
 
-//       // Animate rook movement
-//       this.tweens.add({
-//         targets: this.rook,
-//         x: x,
-//         y: y,
-//         duration: 400,
-//         ease: "Linear",
-//         onStart: () => {
-//           this.isRookMoving = true;
-//         },
-//         onComplete: () => {
-//           this.isRookMoving = false;
-//           this.rookStartRow = newRow;
-//           this.rookStartCol = newCol;
-//           this.highlightValidPaths();
+      // Animate rook movement
+      this.tweens.add({
+        targets: this.rook,
+        x: x,
+        y: y,
+        duration: 400,
+        ease: "Linear",
+        onStart: () => {
+          this.isRookMoving = true;
+        },
+        onComplete: () => {
+          this.isRookMoving = false;
+          this.rookStartRow = newRow;
+          this.rookStartCol = newCol;
+          this.highlightValidPaths();
 
-//           // Check if rook reaches the vortex
-//           if (newRow === 7 && newCol === 0) {
-//             if (gameState.playerTurn) {
-//               toast.warn("You Lose! The other player reached the vortex first.");
-//               setInterval(() => {
-//                 window.location.href = "/";
-//               }, 3000);
-//             }
-//             return;
-//           }
-//         },
-//       });
-//     }
-//   };
+          // Check if rook reaches the vortex
+          if (newRow === 7 && newCol === 0) {
+            if (gameState.isPlayerTurn) {
+              toast.warn("You Lose! The other player reached the vortex first.");
+              setInterval(() => {
+                window.location.href = "/";
+              }, 3000);
+            }
+            return;
+          }
+        },
+      });
+    }
+  };
 
   // Handle click event on a chessboard square
-//   private handleClick(params: { clickedRow: number; clickedCol: number }) {
-//     const { clickedRow, clickedCol } = params;
-//     const x = clickedCol * this.squareSize + 28;
-//     const y = clickedRow * this.squareSize + 30;
-//     let gameState = store.getState().game;
+  private handleClick(params: { clickedRow: number; clickedCol: number }) {
+    const { clickedRow, clickedCol } = params;
+    const x = clickedCol * this.squareSize + 28;
+    const y = clickedRow * this.squareSize + 30;
+    let gameState = store.getState().game;
 
-//     // If it is not the player's turn, do nothing
-//     if (gameState.playerTurn === false) {
-//       console.log("Not the user's turn");
-//       return;
-//     }
+    // If it is not the player's turn, do nothing
+    if (gameState.isPlayerTurn === false) {
+      console.log("Not the user's turn");
+      return;
+    }
 
-//     // If rook clicks on itself, do nothing
-//     if (clickedRow === this.rookStartRow && clickedCol === this.rookStartCol) {
-//       return;
-//     }
+    // If rook clicks on itself, do nothing
+    if (clickedRow === this.rookStartRow && clickedCol === this.rookStartCol) {
+      return;
+    }
 
-//     // Rook cannot go backwards or move diagonally
-//     if (clickedRow < this.rookStartRow || clickedCol > this.rookStartCol || (clickedRow !== this.rookStartRow && clickedCol !== this.rookStartCol)) {
-//       return;
-//     }
+    // Rook cannot go backwards or move diagonally
+    if (clickedRow < this.rookStartRow || clickedCol > this.rookStartCol || (clickedRow !== this.rookStartRow && clickedCol !== this.rookStartCol)) {
+      return;
+    }
 
-//     // Update game state and animate rook movement
-//     store.dispatch(
-//       updateGameState({
-//         rookRow: clickedRow,
-//         rookCol: clickedCol,
-//         playerTurn: false,
-//       })
-//     );
+    // Update game state and animate rook movement
+    store.dispatch(
+      updateGameState({
+        row: clickedRow,
+        column: clickedCol,
+        symbol: gameState.playerSymbol,
+      })
+    );
 
-//     this.tweens.add({
-//       targets: this.rook,
-//       x: x,
-//       y: y,
-//       duration: 400,
-//       ease: "Linear",
-//       onStart: () => {
-//         this.isRookMoving = true;
-//       },
-//       onComplete: () => {
-//         this.isRookMoving = false;
-//         this.rookStartRow = clickedRow;
-//         this.rookStartCol = clickedCol;
-//         this.highlightValidPaths();
+    this.tweens.add({
+      targets: this.rook,
+      x: x,
+      y: y,
+      duration: 400,
+      ease: "Linear",
+      onStart: () => {
+        this.isRookMoving = true;
+      },
+      onComplete: () => {
+        this.isRookMoving = false;
+        this.rookStartRow = clickedRow;
+        this.rookStartCol = clickedCol;
+        this.highlightValidPaths();
 
-//         // Check if rook reaches the vortex
-//         if (clickedRow === 7 && clickedCol === 0) {
-//           toast.success("You Win! You reached the vortex before the other player.");
-//           setInterval(() => {
-//             window.location.href = "/";
-//           }, 3000);
-//           return;
-//         }
-//       },
-//     });
-//   }
+        // Check if rook reaches the vortex
+        if (clickedRow === 7 && clickedCol === 0) {
+          toast.success("You Win! You reached the vortex before the other player.");
+          setInterval(() => {
+            window.location.href = "/";
+          }, 3000);
+          return;
+        }
+      },
+    });
+  }
 }
