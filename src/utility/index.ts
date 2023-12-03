@@ -63,31 +63,7 @@ export const useResetGame = () => {
     resetGame,
   }
 };
-export const useUpdateGameHook = () => {
-  const updateGameMatrix = (column: number, row: number, symbol: "x" | "o",setPlayerTurn:(turn: boolean) => void) => {
-    if (socketService.socket) {
-      gameService.updateGame(socketService.socket, {
-        rookPosition: { x: column, y: row },
-        symbol,
-      });
-      const [currentPlayerWon, otherPlayerWon] = checkGameState({
-        x: column,
-        y: row,
-        symbol,
-      },symbol);
-      if (currentPlayerWon && otherPlayerWon) {
-        // game continues
-      } else if (currentPlayerWon && !otherPlayerWon) {
-        gameService.gameWin(socketService.socket, "You Lost!");
-      }
-      
-      setPlayerTurn(false);
-    }
-  };
-  return {
-    updateGameMatrix,
-  }
-}
+
 export const checkGameState = (rookPosition: {
   x: number;
   y: number;

@@ -71,22 +71,31 @@ export function Game() {
       });
   };
 
-  const handleOpponentRemainingTimeUpdate = () => {
-    if (socketService.socket)
-      gameService.onOpponentRemainingTimeUpdate(
-        socketService.socket,
-        (time: number) => {
-          console.log("Remaining Time", time);
-          dispatch(setRemainingTime(time));
-        }
-      );
-  };
+  useEffect(() => {
+    const handleOpponentRemainingTimeUpdate = () => {
+      if (socketService.socket) {
+        const unsubscribe = gameService.onOpponentRemainingTimeUpdate(
+          socketService.socket,
+          (time: number) => {
+            console.log("Remaining Time", time);
+            // dispatch(setRemainingTime(time));
+          }
+        );
+        return () => {
+          if (socketService.socket) {
+            socketService.socket.off("opponentRemainingTimeUpdate");
+          }
+        };
+      }
+    };
+
+    handleOpponentRemainingTimeUpdate();
+  }, [socketService.socket, gameService, dispatch]);
 
   useEffect(() => {
     handleGameUpdate();
     handleGameStart();
     handleGameWin();
-    handleOpponentRemainingTimeUpdate();
     return () => {
       gameService.stopThrottlingOpponentTimeUpdate();
       gameService.stopTimer();
@@ -94,10 +103,9 @@ export function Game() {
         socketService.socket.off("gameUpdate");
         socketService.socket.off("startGame");
         socketService.socket.off("gameWin");
-        socketService.socket.off("opponentRemainingTimeUpdate");
       }
     };
-  }, []);
+  }, [socketService.socket, gameService, dispatch]);
 
   return (
     <div>

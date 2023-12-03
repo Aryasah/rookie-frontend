@@ -134,6 +134,7 @@ export class Game extends Phaser.Scene {
           this.isRookMoving = true;
         },
         onComplete: () => {
+          console.log("Rook moved to state", newRow, newCol);
           this.isRookMoving = false;
           this.rookStartRow = newRow;
           this.rookStartCol = newCol;
@@ -205,6 +206,7 @@ export class Game extends Phaser.Scene {
         this.isRookMoving = true;
       },
       onComplete: () => {
+        console.log("Rook moved to", clickedRow, clickedCol);
         this.isRookMoving = false;
         this.rookStartRow = clickedRow;
         this.rookStartCol = clickedCol;
