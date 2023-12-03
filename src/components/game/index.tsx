@@ -97,18 +97,24 @@ export function Game() {
 
   const handleGameWin = () => {
     if (socketService.socket)
-      gameService.onGameWin(socketService.socket, (message: string,reason:string) => {
-        console.log("Here gameWin", message,reason);
-        dispatch(setPlayerTurn(false));
-        if (socketService?.socket) socketService.socket.disconnect();
-        if(reason === "timer"){
-          showAlert("you win","Opponent Timed Out!,you won the game",()=>{
-            setInterval(() => {
+      gameService.onGameWin(
+        socketService.socket,
+        (message: string, reason: string) => {
+          console.log("Here gameWin", message, reason);
+          dispatch(setPlayerTurn(false));
+          if (socketService?.socket) socketService.socket.disconnect();
+          if (reason === "timer") {
+            showAlert("you win", "Opponent Timed Out!,you won the game", () => {
               window.location.href = "/";
-            }, 1000);
-          });
+            });
+          }
+          if (reason === "disconnect") {
+            showAlert("you win", "Opponent Left!,you won the game", () => {
+              window.location.href = "/";
+            });
+          }
         }
-      });
+      );
   };
 
   useEffect(() => {
