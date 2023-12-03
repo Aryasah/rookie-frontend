@@ -96,12 +96,17 @@ export function Game() {
 
   const handleGameWin = () => {
     if (socketService.socket)
-      gameService.onGameWin(socketService.socket, (message: string) => {
-        console.log("Here gameWin", message);
+      gameService.onGameWin(socketService.socket, (message: string,reason:string) => {
+        console.log("Here gameWin", message,reason);
         dispatch(setPlayerTurn(false));
-        // alert(message);
+        if(reason === "timer"){
+          alert("Opponent Timed Out!,you won the game");
+        }
+
         if (socketService?.socket) socketService.socket.disconnect();
-        // window.location.reload();
+        setInterval(() => {
+          window.location.href = "/";
+        }, 2000);
       });
   };
 

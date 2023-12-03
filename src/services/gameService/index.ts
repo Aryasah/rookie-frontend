@@ -83,7 +83,7 @@ class GameService {
     this.stopThrottlingOpponentTimeUpdate(); // Stop throttling the opponent time update on each game update
   }
   public async gameWin(socket: Socket, message: string) {
-    socket.emit("game_win", { message });
+    socket.emit("game_win", { message,reason:'win' });
   }
 
   public async onGameUpdate(socket: Socket, listener: (matrix: any) => void) {
@@ -107,10 +107,10 @@ class GameService {
     });
   }
 
-  public async onGameWin(socket: Socket, listener: (message: string) => void) {
-    socket.on("on_game_win", ({ message }) => {
+  public async onGameWin(socket: Socket, listener: (message: string,reason:string) => void) {
+    socket.on("on_game_win", ({ message,reason }) => {
       this.stopTimer(); // Stop the timer when the game is won
-      listener(message);
+      listener(message,reason);
     });
   }
 
@@ -122,7 +122,10 @@ class GameService {
     socket.disconnect();
     alert("You ran out of time. You lose!");
     this.resetSocket(socket);
-    window.location.reload();
+    setInterval(() => {
+      window.location.href = "/";
+    }, 2000);
+    return
   }
 
   public resetSocket(socket: Socket) {

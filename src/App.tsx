@@ -57,7 +57,7 @@ function App() {
                     </div>
                   </motion.header>
                   <motion.div
-                    className="flex flex-row justify-between w-full flex-1  py-4"
+                    className="flex md:flex-row  sm:flex-col justify-between w-full flex-1  py-4"
                     {...slideAnimation("down")}
                   >
                     <motion.div
@@ -91,17 +91,17 @@ function App() {
                       </motion.div>
                     </motion.div>
                     <motion.div
-                      className="flex flex-col justify-center items-center w-fit"
+                      className="flex flex-col justify-center items-center w-fit md:py-0 sm:py-4 md:w-1/2 sm:w-full"
                       {...headContainerAnimation}
                     >
                       <motion.div
                         {...headContentAnimation}
-                        className="border-2 border-gray-200  rounded-lg p-4"
+                        className="border-2 border-gray-200 sm:w-full  rounded-lg p-4"
                       >
                         <h3 className="text-black font-bold text-xl uppercase mb-4">
                           How to play ?
                         </h3>
-                        <div className="max-w-md text-gray-600 text-lg">
+                        <div className="md:max-w-lg sm:max-w-2xl text-gray-600 text-lg">
                           <ul className="list-disc pl-4">
                             <li className="mb-2">
                               The game will be played on an 8x8 chessboard.
