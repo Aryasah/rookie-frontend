@@ -99,7 +99,7 @@ export function JoinRoom(props: IJoinRoomProps) {
               <form className="flex flex-col items-center">
                 <input
                   type="text"
-                  placeholder="Room Name"
+                  placeholder="Room Id"
                   value={roomName}
                   onChange={handleRoomNameChange}
                   className="w-80 px-4 py-2.5 text-black border border-black rounded-lg outline-none focus:ring-2 focus:ring-black mb-4"

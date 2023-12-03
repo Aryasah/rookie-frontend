@@ -155,7 +155,7 @@ export function Game() {
 
   return (
     <AnimatePresence>
-      <motion.section className="home" {...slideAnimation("left")}>
+      <motion.section className="home h-full" {...slideAnimation("left")}>
         <motion.header {...slideAnimation("down")}>
           <div className="flex-row flex">
             <img
@@ -169,11 +169,15 @@ export function Game() {
           </div>
         </motion.header>
         <motion.div
-          className="flex flex-row justify-between w-full flex-1  py-4"
+          className="flex flex-row justify-between w-full h-full flex-1  py-4"
           {...slideAnimation("down")}
         >
           <motion.div
-            className="border-2 flex-1 flex flex-col justify-start items-center rounded-lg text-2xl text-black leading-3 py-4"
+            className={`
+            ${
+              !game.isGameStarted && "border-2 py-4"
+            }  flex-1 flex flex-col justify-start items-center rounded-lg text-2xl text-black leading-3 py-4"
+            `}
             {...headContainerAnimation}
           >
             <motion.div {...headTextAnimation}>
@@ -185,7 +189,9 @@ export function Game() {
                 Game ID: {game.roomId}
                 <CopyToClipboard
                   text={`${game.roomId}`}
-                  onCopy={() => toast.success("Game Id Copied to Clipboard")}
+                  onCopy={() =>
+                    showAlert("Copied", "Game ID Copied to Clipboard", () => {})
+                  }
                 >
                   <span className="text-xl px-1 text-gray-500 cursor-pointer">
                     &#x1F4CB;
@@ -195,7 +201,9 @@ export function Game() {
             </motion.div>
             <motion.div
               {...headContentAnimation}
-              className="flex flex-col gap-5 flex-1 w-full justify-center items-center "
+              className={`flex ${
+                game.isGameStarted && "border-2 my-2"
+              }  rounded-lg flex-col gap-5 flex-1 w-full justify-center items-center `}
             >
               {game.isGameStarted ? (
                 <>

@@ -22,7 +22,7 @@ function App() {
 
   const connectSocket = async () => {
     const socket = await socketService
-      .connect("http://localhost:9000")
+      .connect("https://cuemath-rookie-backend.onrender.com")
       .catch((err) => {
         console.log("Error: ", err);
       });

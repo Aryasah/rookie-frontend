@@ -121,7 +121,7 @@ class GameService {
     // Implement logic for what happens when the timer ends
     socket.emit("game_end_due_to_timer"); // Example: Notify the server that the game ended due to the timer
     socket.disconnect();
-    showAlert("you loose","You ran out of time. You lose!",()=>{
+    showAlert("you loose","You ran out of time. You loose!",()=>{
       setInterval(() => {
         window.location.href = "/";
       }, 1000);

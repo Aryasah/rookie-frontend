@@ -148,7 +148,7 @@ export class Game extends Phaser.Scene {
                 gameService.endGame(socketService.socket);
               showAlert(
                 "you loose",
-                "You Lose! The other player reached the vortex first",
+                "You Loose! The other player reached the vortex first",
                 () => {
                   setInterval(() => {
                     window.location.href = "/";
@@ -156,7 +156,7 @@ export class Game extends Phaser.Scene {
                 }
               );
               console.log(
-                "You Lose! The other player reached the vortex first."
+                "You Loose! The other player reached the vortex first."
               );
               // setInterval(() => {
               //   window.location.href = "/";
