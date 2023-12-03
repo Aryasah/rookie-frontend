@@ -13,7 +13,7 @@ export interface IGameState {
 }
 
 const initialState: IGameState = {
-  rookPosition: { x: 7, y: 7 },
+  rookPosition: { x: 0, y: 7 },
   isInRoom: false,
   playerSymbol: "x",
   isPlayerTurn: false,
@@ -59,13 +59,14 @@ const gameSlice = createSlice({
             y: column,
             x: row,
             symbol,
-          }, symbol);
+          }, state.playerSymbol);
+
+          console.log('currentPlayerWon', currentPlayerWon, 'otherPlayerWon', otherPlayerWon, 'symbol', symbol, 'playerSymbol', state.playerSymbol);
   
           if (currentPlayerWon && otherPlayerWon) {
             // game continues
           } else if (currentPlayerWon && !otherPlayerWon) {
             gameService.gameWin(socketService.socket, 'You Lost!');
-            alert('You Won!');
           }
   
           state.isPlayerTurn = false;

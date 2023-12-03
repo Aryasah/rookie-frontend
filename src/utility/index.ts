@@ -79,7 +79,6 @@ export const useUpdateGameHook = () => {
         // game continues
       } else if (currentPlayerWon && !otherPlayerWon) {
         gameService.gameWin(socketService.socket, "You Lost!");
-        alert("You Won!");
       }
       
       setPlayerTurn(false);
@@ -96,7 +95,8 @@ export const checkGameState = (rookPosition: {
 },
 playerSymbol: "x" | "o"
 ) => {
-  if (rookPosition.x === 7 && rookPosition.y === 7) {
+  
+  if (rookPosition.x === 7 && rookPosition.y === 0) {
     if (rookPosition.symbol === playerSymbol) {
       return [true, false];
     }

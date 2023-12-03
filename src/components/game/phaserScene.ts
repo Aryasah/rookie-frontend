@@ -1,8 +1,10 @@
 // Import necessary modules and components
 import "phaser";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import store from "../../redux/store";
 import { updateGameState } from "../../redux/gameSlice";
+import gameService from "../../services/gameService";
+import socketService from "../../services/socketService";
 
 // Define the Game class extending Phaser.Scene
 export class Game extends Phaser.Scene {
@@ -140,7 +142,12 @@ export class Game extends Phaser.Scene {
           // Check if rook reaches the vortex
           if (newRow === 7 && newCol === 0) {
             if (gameState.isPlayerTurn) {
-              toast.warn("You Lose! The other player reached the vortex first.");
+              alert("You Lose! The other player reached the vortex first.");
+              console.log(
+                "You Lose! The other player reached the vortex first."
+              );
+              if (socketService.socket)
+                gameService.endGame(socketService.socket);
               setInterval(() => {
                 window.location.href = "/";
               }, 3000);
@@ -171,7 +178,11 @@ export class Game extends Phaser.Scene {
     }
 
     // Rook cannot go backwards or move diagonally
-    if (clickedRow < this.rookStartRow || clickedCol > this.rookStartCol || (clickedRow !== this.rookStartRow && clickedCol !== this.rookStartCol)) {
+    if (
+      clickedRow < this.rookStartRow ||
+      clickedCol > this.rookStartCol ||
+      (clickedRow !== this.rookStartRow && clickedCol !== this.rookStartCol)
+    ) {
       return;
     }
 
@@ -201,7 +212,11 @@ export class Game extends Phaser.Scene {
 
         // Check if rook reaches the vortex
         if (clickedRow === 7 && clickedCol === 0) {
-          toast.success("You Win! You reached the vortex before the other player.");
+          alert("You Win! You reached the vortex before the other player.");
+          console.log(
+            "You Win! You reached the vortex before the other player."
+          );
+          if (socketService.socket) gameService.endGame(socketService.socket);
           setInterval(() => {
             window.location.href = "/";
           }, 3000);

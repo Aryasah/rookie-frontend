@@ -20,7 +20,7 @@ class GameService {
         const { start, symbol } = options;
 
         if (start) {
-          this.startTimer(socket, 10, () => {
+          this.startTimer(socket, 60, () => {
             this.onTimerEnd(socket);
           }); // Start the timer when the game starts
           this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update when the game starts
@@ -41,7 +41,7 @@ class GameService {
         const { start, symbol } = options;
 
         if (start) {
-          this.startTimer(socket, 10, () => {
+          this.startTimer(socket, 60, () => {
             this.onTimerEnd(socket);
           }); // Start the timer when the game starts
           this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update when the game starts
@@ -85,7 +85,7 @@ class GameService {
 
   public async onGameUpdate(socket: Socket, listener: (matrix: any) => void) {
     socket.on("on_game_update", ({ matrix }) => {
-      this.startTimer(socket, 10, () => {
+      this.startTimer(socket, 60, () => {
         this.onTimerEnd(socket);
       }); // Restart the timer on each game update
       this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update on each game update
@@ -122,7 +122,7 @@ class GameService {
     window.location.reload();
   }
 
-  private resetSocket(socket: Socket) {
+  public resetSocket(socket: Socket) {
     if (socket) {
       socket.off("gameUpdate");
       socket.off("startGame");
@@ -159,6 +159,13 @@ class GameService {
     socket.on("opponent_time_update", ({ remainingTime }) => {
       listener(remainingTime);
     });
+  }
+
+  // end game
+  public async endGame(socket: Socket) {
+    this.stopTimer();
+    this.stopThrottlingOpponentTimeUpdate();
+    this.resetSocket(socket);
   }
 }
 

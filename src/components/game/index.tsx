@@ -16,18 +16,6 @@ import {
 } from "../../redux/gameSlice";
 
 export function Game() {
-  // const {
-  //   playerSymbol,
-  //   setPlayerSymbol,
-  //   setPlayerTurn,
-  //   isPlayerTurn,
-  //   setGameStarted,
-  //   isGameStarted,
-  //   rookPostion,
-  //   setRookPosition,
-  //   remainingTime,
-  //   setRemainingTime,
-  // } = useContext(gameContext);
   const dispatch = useDispatch();
   const game = useSelector(
     (state: {
@@ -37,7 +25,7 @@ export function Game() {
   );
 
   const [row, setRow] = useState(0);
-  const [column, setColumn] = useState(0);
+  const [column, setColumn] = useState(7);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,10 +65,9 @@ export function Game() {
       gameService.onGameWin(socketService.socket, (message: string) => {
         console.log("Here gameWin", message);
         dispatch(setPlayerTurn(false));
-        alert(message);
-        // resetGame();
+        // alert(message);
         if (socketService?.socket) socketService.socket.disconnect();
-        window.location.reload();
+        // window.location.reload();
       });
   };
 
