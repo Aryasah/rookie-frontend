@@ -4,7 +4,7 @@ import { useResetGame } from "../../utility";
 class GameService {
   private timer: NodeJS.Timeout | null = null;
   private remainingTimer: NodeJS.Timeout | null = null;
-  private remainingTime: number = 10;
+  public remainingTime: number = 30;
 
 
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
@@ -20,7 +20,7 @@ class GameService {
         const { start, symbol } = options;
 
         if (start) {
-          this.startTimer(socket, 60, () => {
+          this.startTimer(socket, 30, () => {
             this.onTimerEnd(socket);
           }); // Start the timer when the game starts
           this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update when the game starts
@@ -28,7 +28,10 @@ class GameService {
       });
     });
   }
-  public async createGameRoom(socket: Socket): Promise<boolean> {
+  public getTimer = () => {
+    return this.timer;
+  }
+  public async createGameRoom(socket: Socket): Promise<string> {
     return new Promise((rs, rj) => {
       socket.emit("create_game");
       socket.on("room_created", ({roomId}) => rs(roomId));
@@ -41,7 +44,7 @@ class GameService {
         const { start, symbol } = options;
 
         if (start) {
-          this.startTimer(socket, 60, () => {
+          this.startTimer(socket, 30, () => {
             this.onTimerEnd(socket);
           }); // Start the timer when the game starts
           this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update when the game starts
@@ -85,7 +88,7 @@ class GameService {
 
   public async onGameUpdate(socket: Socket, listener: (matrix: any) => void) {
     socket.on("on_game_update", ({ matrix }) => {
-      this.startTimer(socket, 60, () => {
+      this.startTimer(socket, 30, () => {
         this.onTimerEnd(socket);
       }); // Restart the timer on each game update
       this.throttleOpponentTimeUpdate(socket); // Throttle the opponent time update on each game update

@@ -5,6 +5,7 @@ import { checkGameState } from "../utility";
 
 export interface IGameState {
   rookPosition: { x: number; y: number };
+  roomId: string;
   isInRoom: boolean;
   playerSymbol: "x" | "o";
   isPlayerTurn: boolean;
@@ -14,6 +15,7 @@ export interface IGameState {
 
 const initialState: IGameState = {
   rookPosition: { x: 0, y: 7 },
+  roomId: "",
   isInRoom: false,
   playerSymbol: "x",
   isPlayerTurn: false,
@@ -31,8 +33,12 @@ const gameSlice = createSlice({
     ) => {
       state.rookPosition = action.payload;
     },
-    setInRoom: (state: IGameState, action: PayloadAction<boolean>) => {
-      state.isInRoom = action.payload;
+    setInRoom: (state: IGameState, action: PayloadAction<{
+      roomId: string;
+      isInRoom: boolean;
+    }>) => {
+      state.isInRoom = action.payload.isInRoom;
+      state.roomId = action.payload.roomId;
     },
     setPlayerSymbol: (state: IGameState, action: PayloadAction<"x" | "o">) => {
       state.playerSymbol = action.payload;

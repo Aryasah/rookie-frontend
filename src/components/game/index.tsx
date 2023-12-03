@@ -14,6 +14,18 @@ import {
   setRookPosition,
   updateGameState,
 } from "../../redux/gameSlice";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  headContainerAnimation,
+  headContentAnimation,
+  headTextAnimation,
+  slideAnimation,
+} from "../../utility/config";
+import GameComponent from "./canvasComponent";
+import { CircularProgressbar } from "react-circular-progressbar";
+import CopyToClipboard from "react-copy-to-clipboard";
+import CustomButton from "../shared/customButton";
+import { toast } from "react-toastify";
 
 export function Game() {
   const dispatch = useDispatch();
@@ -27,16 +39,38 @@ export function Game() {
   const [row, setRow] = useState(0);
   const [column, setColumn] = useState(7);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!game.isPlayerTurn) return alert("Not your turn!");
-    if (!isValidMove(game.rookPosition.x, game.rookPosition.y, row, column))
-      return alert("Invalid Move!");
+  const [timer, setTimer] = useState(30);
+  const [timerSelf, setTimerSelf] = useState(30);
+  const [timerOther, setTimerOther] = useState(30);
 
-    dispatch(
-      updateGameState({ row: row, column: column, symbol: game.playerSymbol })
-    );
-  };
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (game.isGameStarted && game.isPlayerTurn) {
+      interval = setInterval(() => {
+        setTimerSelf((prevTimerSelf) => {
+          return prevTimerSelf - 1;
+        });
+      }, 1000);
+    } else if (game.isGameStarted && !game.isPlayerTurn) {
+      interval = setInterval(() => {
+        setTimerOther((prevTimerOther) => {
+          return prevTimerOther - 1;
+        });
+      }, 1000);
+    } else {
+      // Reset timers if the game is not started or it's not player's turn
+      setTimerSelf(30);
+      setTimerOther(30);
+    }
+
+    // Cleanup function
+    return () => {
+      clearInterval(interval);
+      setTimerSelf(30);
+      setTimerOther(30);
+    };
+  }, [game.isGameStarted, game.isPlayerTurn]);
 
   const handleGameUpdate = () => {
     if (socketService.socket)
@@ -108,36 +142,170 @@ export function Game() {
   }, [socketService.socket, gameService, dispatch]);
 
   return (
-    <div>
-      {!game.isGameStarted && (
-        <h2>Waiting for Other Player to Join to Start the Game!</h2>
-      )}
-      {game.isGameStarted && (
-        <>
-          <h2>Game Started!</h2>
-          <h2>Remaining Time: {game.remainingTime}</h2>
-          <form onSubmit={handleSubmit}>
-            <label>
-              Row:
-              <input
-                type="number"
-                value={row}
-                onChange={(e) => setRow(Number(e.target.value))}
-              />
-            </label>
-            <label>
-              Column:
-              <input
-                type="number"
-                value={column}
-                onChange={(e) => setColumn(Number(e.target.value))}
-              />
-            </label>
-            <button type="submit">Submit</button>
-          </form>
-        </>
-      )}
-      <h2>{game.isPlayerTurn ? "Your Turn" : "Other Player's Turn"}</h2>
-    </div>
+    <AnimatePresence>
+      <motion.section className="home" {...slideAnimation("left")}>
+        <motion.header {...slideAnimation("down")}>
+          <div className="flex-row flex">
+            <img
+              src="../assets/images/rook.png"
+              alt="logo"
+              className="w-8 h-8 object-contain"
+            />
+            <h5 className="uppercase text-2xl text-black font-bold px-2">
+              rook's game
+            </h5>
+          </div>
+        </motion.header>
+        <motion.div
+          className="flex flex-row justify-between w-full flex-1  py-4"
+          {...slideAnimation("down")}
+        >
+          <motion.div
+            className="border-2 flex-1 flex flex-col justify-start items-center rounded-lg text-2xl text-black leading-3 py-4"
+            {...headContainerAnimation}
+          >
+            <motion.div {...headTextAnimation}>
+              <h1 className="game-head-text">
+                Welcome to <br className="xl:block hidden uppercase" /> 1x1
+                Rook's Game
+              </h1>
+              <p className="max-w-md font-normal text-center text-gray-600 text-lg my-1">
+                Game ID: {game.roomId}
+                <CopyToClipboard
+                  text={`${game.roomId}`}
+                  onCopy={() => toast.success("Game Id Copied to Clipboard")}
+                >
+                  <span className="text-xl px-1 text-gray-500 cursor-pointer">
+                    &#x1F4CB;
+                  </span>
+                </CopyToClipboard>
+              </p>
+            </motion.div>
+            <motion.div
+              {...headContentAnimation}
+              className="flex flex-col gap-5 flex-1 w-full justify-center items-center "
+            >
+              {game.isGameStarted ? (
+                <>
+                  <div className="game-area">
+                    <div className="playerSection player-top">
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <CircularProgressbar
+                          styles={{
+                            root: {
+                              height: "78px",
+                              width: "78px",
+                              position: "absolute",
+                              top: "20px",
+                              zIndex: "1",
+                            },
+                            path: {
+                              stroke: "#3DD771",
+                            },
+                            trail: {
+                              stroke: "#2B2B2B",
+                            },
+                          }}
+                          value={timerOther / 30}
+                          maxValue={1}
+                          counterClockwise
+                        />
+                      </div>
+                      <img
+                        className="profileIcon"
+                        src={`https://api.dicebear.com/7.x/bottts/svg?seed=opponent`}
+                        alt=""
+                      />
+                      <div className="text top">Opponent</div>
+                      <div className="turn">
+                        {game.isPlayerTurn ? "" : "Opponents Turn"}
+                      </div>
+                    </div>
+                    <div className="py-2">
+                      <GameComponent />
+                    </div>
+                    <div className="playerSection player-bottom">
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <CircularProgressbar
+                          styles={{
+                            root: {
+                              height: "78px",
+                              width: "78px",
+                              position: "absolute",
+                              top: "20px",
+                              zIndex: "1",
+                            },
+                            path: {
+                              stroke: "#3DD771",
+                            },
+                            trail: {
+                              stroke: "#2B2B2B",
+                            },
+                          }}
+                          value={timerSelf / 30}
+                          maxValue={1}
+                          counterClockwise
+                        />
+                      </div>
+                      <img
+                        className="profileIcon z-100"
+                        src={`https://api.dicebear.com/7.x/bottts/svg?seed=you`}
+                        alt=""
+                      />
+                      <div className="text bottom">You </div>
+                      <div className="turn">
+                        {game.isPlayerTurn ? "Your Turn" : ""}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="animate-pulse max-w-fit font-normal text-gray-600 text-xl">
+                    {game.isGameStarted
+                      ? game.isPlayerTurn
+                        ? "Your Turn"
+                        : "Other Player's Turn"
+                      : "Waiting for Other Player to Join to Start the Game!"}
+                  </p>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </motion.section>
+    </AnimatePresence>
   );
+}
+{
+  /* // <div className="gameComponent">
+    //   <h1>Game</h1>
+    //   <h2>Game ID: {game.roomId}</h2>
+
+    //   {!game.isGameStarted && (
+    //     <h3>Waiting for Other Player to Join to Start the Game!</h3>
+    //   )}
+
+    //   {game.isGameStarted && (
+    //     <>
+    //       <h3>Game Started!</h3>
+    //       <h3>Remaining Time: {game.remainingTime}</h3>
+
+    //     </>
+    //   )}
+
+    //   <h3>{game.isPlayerTurn ? "Your Turn" : "Other Player's Turn"}</h3>
+    // </div> */
 }

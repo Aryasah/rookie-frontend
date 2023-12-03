@@ -16,7 +16,7 @@ html {
 }
 
 .app {
-  @apply relative w-full h-screen  overflow-hidden;
+  @apply relative w-full h-screen  overflow-x-hidden;
 }
 
 .home {
@@ -30,8 +30,14 @@ html {
   @apply flex-1 xl:justify-center justify-start flex flex-col gap-10;
 }
 
+.game{
+  @apply w-full h-full flex justify-center items-center;
+}
 .head-text {
   @apply xl:text-[10rem] text-[6rem] xl:leading-[11rem] leading-[7rem] font-black text-black;
+}
+.game-head-text {
+  @apply xl:text-[2rem] text-[1rem] xl:leading-[2rem] leading-[1rem] font-semibold text-center text-black;
 }
 
 .download-btn {
