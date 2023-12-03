@@ -5,11 +5,7 @@ class GameService {
   private timer: NodeJS.Timeout | null = null;
   private remainingTimer: NodeJS.Timeout | null = null;
   private remainingTime: number = 10;
-  private resetGame: () => void;
 
-  constructor() {
-    this.resetGame = useResetGame;
-  }
 
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
     return new Promise((rs, rj) => {

@@ -1,7 +1,9 @@
 import React, { useContext, useState } from "react";
 import gameContext from "../../gameContext";
 import gameService from "../../services/gameService";
+import { useDispatch, useSelector } from "react-redux";
 import socketService from "../../services/socketService";
+import { IGameState, setInRoom } from "../../redux/gameSlice";
 
 interface IJoinRoomProps {}
 
@@ -9,7 +11,13 @@ export function JoinRoom(props: IJoinRoomProps) {
   const [roomName, setRoomName] = useState("");
   const [isJoining, setJoining] = useState(false);
 
-  const { setInRoom, isInRoom } = useContext(gameContext);
+  // const { setInRoom, isInRoom } = useContext(gameContext);
+  const dispatch = useDispatch();
+  const game = useSelector(
+    (state: {
+      game: IGameState;
+    }) => state.game
+  );
 
   const handleRoomNameChange = (e: React.ChangeEvent<any>) => {
     const value = e.target.value;
@@ -30,7 +38,10 @@ export function JoinRoom(props: IJoinRoomProps) {
         alert(err);
       });
 
-    if (joined) setInRoom(true);
+    if (joined) {
+      dispatch(setInRoom(true));
+    }
+
 
     setJoining(false);
   };
@@ -46,14 +57,14 @@ export function JoinRoom(props: IJoinRoomProps) {
       alert(err);
     });
     console.log("roomId: ", roomId)
-    if (roomId !== null) setInRoom(true);
+    if (roomId !== null) dispatch(setInRoom(true));
 
     setJoining(false);
   };
 
   return (
     <>
-      {!isInRoom && (
+      {!game.isInRoom && (
         <>
           <h1>Join Room</h1>
           <form onSubmit={joinRoom}>

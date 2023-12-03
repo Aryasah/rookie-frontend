@@ -1,82 +1,59 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import gameContext from "../../gameContext";
+import { useDispatch, useSelector } from "react-redux";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
-import { isValidMove, useResetGame } from "../../utility";
+import {
+  checkGameState,
+  isValidMove,
+  updateGameMatrix,
+  useResetGame,
+} from "../../utility";
+import { IGameState, setGameStarted, setPlayerSymbol, setPlayerTurn, setRemainingTime, setRookPosition } from "../../redux/gameSlice";
 
 export function Game() {
-  const {
-    playerSymbol,
-    setPlayerSymbol,
-    setPlayerTurn,
-    isPlayerTurn,
-    setGameStarted,
-    isGameStarted,
-    rookPostion,
-    setRookPosition,
-    remainingTime,
-    setRemainingTime,
-  } = useContext(gameContext);
-  const { resetGame } = useResetGame();
+  // const {
+  //   playerSymbol,
+  //   setPlayerSymbol,
+  //   setPlayerTurn,
+  //   isPlayerTurn,
+  //   setGameStarted,
+  //   isGameStarted,
+  //   rookPostion,
+  //   setRookPosition,
+  //   remainingTime,
+  //   setRemainingTime,
+  // } = useContext(gameContext);
+  const dispatch = useDispatch();
+  const game = useSelector(
+    (state: {
+      game: IGameState;
+      // Add other slices if you have them
+    }) => state.game
+  );
 
   const [row, setRow] = useState(0);
   const [column, setColumn] = useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateGameMatrix(column, row, playerSymbol);
-  };
-
-  const checkGameState = (rookPosition: {
-    x: number;
-    y: number;
-    symbol: "x" | "o";
-  }) => {
-    if (rookPosition.x === 7 && rookPosition.y === 7) {
-      if (rookPosition.symbol === playerSymbol) {
-        return [true, false];
-      }
-      return [false, true];
-    }
-    return [false, false];
-  };
-
-  const updateGameMatrix = (column: number, row: number, symbol: "x" | "o") => {
-    if (!isPlayerTurn) return alert("Not your turn!");
-    if (!isValidMove(rookPostion.x, rookPostion.y, row, column))
+    if (!game.isPlayerTurn) return alert("Not your turn!");
+    if (!isValidMove(game.rookPosition.x, game.rookPosition.y, row, column))
       return alert("Invalid Move!");
-    if (socketService.socket) {
-      gameService.updateGame(socketService.socket, {
-        rookPosition: { x: column, y: row },
-        symbol,
-      });
-      const [currentPlayerWon, otherPlayerWon] = checkGameState({
-        x: column,
-        y: row,
-        symbol,
-      });
-      if (currentPlayerWon && otherPlayerWon) {
-        // game continues
-      } else if (currentPlayerWon && !otherPlayerWon) {
-        gameService.gameWin(socketService.socket, "You Lost!");
-        alert("You Won!");
-      }
-      // else{
-      //   gameService.gameWin(socketService.socket, "You Won!");
-      //   alert("You Lost!");
-      // }
-      setPlayerTurn(false);
-    }
+    updateGameMatrix(column, row, game.playerSymbol, (turn) => {
+      dispatch(setPlayerTurn(turn));
+    });
   };
 
   const handleGameUpdate = () => {
     if (socketService.socket)
       gameService.onGameUpdate(socketService.socket, (newGameState) => {
         console.log("Here", newGameState);
-        setRookPosition(newGameState.rookPosition);
-        checkGameState(newGameState.rookPosition);
-        setPlayerTurn(true);
+        dispatch(setRookPosition(newGameState.rookPosition));
+        // setRookPosition(newGameState.rookPosition);
+        checkGameState(newGameState.rookPosition, game.playerSymbol);
+        dispatch(setPlayerTurn(true));
       });
   };
 
@@ -85,10 +62,12 @@ export function Game() {
       gameService.onStartGame(socketService.socket, 30, (options: any) => {
         const { message } = options; // Extract the 'message' property from 'options'
         console.log("Here handleGameStart", message);
-        setGameStarted(true);
-        setPlayerSymbol(options.symbol);
-        if (options.start) setPlayerTurn(true);
-        else setPlayerTurn(false);
+        // setGameStarted(true);
+        dispatch(setGameStarted(true));
+        // setPlayerSymbol(options.symbol);
+        dispatch(setPlayerSymbol(options.symbol));
+        if (options.start) dispatch(setPlayerTurn(true));
+        else dispatch(setPlayerTurn(false));
       });
   };
 
@@ -96,11 +75,10 @@ export function Game() {
     if (socketService.socket)
       gameService.onGameWin(socketService.socket, (message: string) => {
         console.log("Here gameWin", message);
-        setPlayerTurn(false);
+        dispatch(setPlayerTurn(false));
         alert(message);
         // resetGame();
-        if(socketService?.socket)
-        socketService.socket.disconnect();
+        if (socketService?.socket) socketService.socket.disconnect();
         window.location.reload();
       });
   };
@@ -111,7 +89,7 @@ export function Game() {
         socketService.socket,
         (time: number) => {
           console.log("Remaining Time", time);
-          setRemainingTime(time);
+          dispatch(setRemainingTime(time));
         }
       );
   };
@@ -135,13 +113,13 @@ export function Game() {
 
   return (
     <div>
-      {!isGameStarted && (
+      {!game.isGameStarted && (
         <h2>Waiting for Other Player to Join to Start the Game!</h2>
       )}
-      {isGameStarted && (
+      {game.isGameStarted && (
         <>
           <h2>Game Started!</h2>
-          <h2>Remaining Time: {remainingTime}</h2>
+          <h2>Remaining Time: {game.remainingTime}</h2>
           <form onSubmit={handleSubmit}>
             <label>
               Row:
@@ -163,7 +141,7 @@ export function Game() {
           </form>
         </>
       )}
-      <h2>{isPlayerTurn ? "Your Turn" : "Other Player's Turn"}</h2>
+      <h2>{game.isPlayerTurn ? "Your Turn" : "Other Player's Turn"}</h2>
     </div>
   );
 }
