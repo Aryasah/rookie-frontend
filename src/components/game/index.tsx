@@ -169,16 +169,21 @@ export function Game() {
           </div>
         </motion.header>
         <motion.div
-          className="flex flex-row justify-between w-auto md:w-full h-full flex-1  py-4 px-0"
+          className="flex flex-row justify-between w-[100%] md:w-full h-full flex-1  py-4 px-0"
           {...slideAnimation("down")}
         >
           <motion.div
             className={`
             ${
               !game.isGameStarted && "border-2 py-4"
-            }  flex-1 flex flex-col justify-start items-center rounded-lg text-2xl text-black leading-3 py-4 w-[100%]"
+            }  flex-1 flex flex-col justify-start items-center rounded-lg text-2xl text-black leading-3 py-4"
             `}
             {...headContainerAnimation}
+            style={
+              {
+                width: "100%",
+              }
+            }
           >
             <motion.div {...headTextAnimation}>
               <h1 className="game-head-text">
@@ -208,7 +213,7 @@ export function Game() {
               {game.isGameStarted ? (
                 <>
                   <div className="game-area">
-                    <div className="playerSection player-top">
+                    <div className="playerSection pt-2 player-top">
                       <div
                         style={{
                           display: "flex",
