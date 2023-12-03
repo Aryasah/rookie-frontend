@@ -16,7 +16,7 @@ html {
 }
 
 .app {
-  @apply relative w-full h-screen  overflow-x-hidden;
+  @apply relative w-full h-screen ;
 }
 
 .home {
@@ -37,7 +37,7 @@ html {
   @apply xl:text-[10rem] text-[6rem] xl:leading-[11rem] leading-[7rem] font-black text-black;
 }
 .game-head-text {
-  @apply xl:text-[2rem] text-[1rem] xl:leading-[2rem] leading-[1rem] font-semibold text-center text-black;
+  @apply xl:text-[2rem] text-[1.3rem] xl:leading-[2rem] leading-[1.5rem] font-semibold text-center text-black;
 }
 
 .download-btn {

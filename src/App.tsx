@@ -57,7 +57,7 @@ function App() {
                     </div>
                   </motion.header>
                   <motion.div
-                    className="flex md:flex-row  sm:flex-col justify-between w-full flex-1  py-4"
+                    className="flex  md:flex-row flex-col justify-between w-full flex-1  py-4"
                     {...slideAnimation("down")}
                   >
                     <motion.div
@@ -91,7 +91,7 @@ function App() {
                       </motion.div>
                     </motion.div>
                     <motion.div
-                      className="flex flex-col justify-center items-center w-fit md:py-0 sm:py-4 md:w-1/2 sm:w-full"
+                      className="flex flex-col justify-center items-center w-fit md:py-0 py-4 md:w-1/2 sm:w-full"
                       {...headContainerAnimation}
                     >
                       <motion.div

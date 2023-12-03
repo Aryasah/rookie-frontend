@@ -169,14 +169,14 @@ export function Game() {
           </div>
         </motion.header>
         <motion.div
-          className="flex flex-row justify-between w-full h-full flex-1  py-4"
+          className="flex flex-row justify-between w-auto md:w-full h-full flex-1  py-4 px-0"
           {...slideAnimation("down")}
         >
           <motion.div
             className={`
             ${
               !game.isGameStarted && "border-2 py-4"
-            }  flex-1 flex flex-col justify-start items-center rounded-lg text-2xl text-black leading-3 py-4"
+            }  flex-1 flex flex-col justify-start items-center rounded-lg text-2xl text-black leading-3 py-4 w-[100%]"
             `}
             {...headContainerAnimation}
           >
@@ -293,7 +293,7 @@ export function Game() {
                 </>
               ) : (
                 <>
-                  <p className="animate-pulse max-w-fit font-normal text-gray-600 text-xl">
+                  <p className="animate-pulse max-w-fit font-normal text-gray-600 text-center px-4 text-base md:text-xl">
                     {game.isGameStarted
                       ? game.isPlayerTurn
                         ? "Your Turn"
@@ -308,24 +308,4 @@ export function Game() {
       </motion.section>
     </AnimatePresence>
   );
-}
-{
-  /* // <div className="gameComponent">
-    //   <h1>Game</h1>
-    //   <h2>Game ID: {game.roomId}</h2>
-
-    //   {!game.isGameStarted && (
-    //     <h3>Waiting for Other Player to Join to Start the Game!</h3>
-    //   )}
-
-    //   {game.isGameStarted && (
-    //     <>
-    //       <h3>Game Started!</h3>
-    //       <h3>Remaining Time: {game.remainingTime}</h3>
-
-    //     </>
-    //   )}
-
-    //   <h3>{game.isPlayerTurn ? "Your Turn" : "Other Player's Turn"}</h3>
-    // </div> */
 }

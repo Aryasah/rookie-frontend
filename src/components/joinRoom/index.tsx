@@ -125,29 +125,6 @@ export function JoinRoom(props: IJoinRoomProps) {
           )}
         </div>
       </motion.div>
-
-      {/* {!game.isInRoom && (
-        <>
-          <h1>Join Room</h1>
-          <form onSubmit={joinRoom}>
-            <input
-              type="text"
-              placeholder="Room Name"
-              value={roomName}
-              onChange={handleRoomNameChange}
-            />
-            <button type="submit" disabled={isJoining}>
-              Join Room
-            </button>
-          </form>
-          <h2>Create Room</h2>
-          <form onSubmit={createRoom}>
-            <button type="submit" disabled={isJoining}>
-              Create Room
-            </button>
-          </form>
-        </>
-      )} */}
     </>
   );
 }
