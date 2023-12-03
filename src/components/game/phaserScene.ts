@@ -5,6 +5,7 @@ import store from "../../redux/store";
 import { updateGameState } from "../../redux/gameSlice";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
+import { showAlert } from "../../utility/customAlert";
 
 // Define the Game class extending Phaser.Scene
 export class Game extends Phaser.Scene {
@@ -143,15 +144,23 @@ export class Game extends Phaser.Scene {
           // Check if rook reaches the vortex
           if (newRow === 7 && newCol === 0) {
             if (gameState.isPlayerTurn) {
-              alert("You Lose! The other player reached the vortex first.");
+              if (socketService.socket)
+                gameService.endGame(socketService.socket);
+              showAlert(
+                "you loose",
+                "You Lose! The other player reached the vortex first",
+                () => {
+                  setInterval(() => {
+                    window.location.href = "/";
+                  }, 1000);
+                }
+              );
               console.log(
                 "You Lose! The other player reached the vortex first."
               );
-              if (socketService.socket)
-                gameService.endGame(socketService.socket);
-              setInterval(() => {
-                window.location.href = "/";
-              }, 3000);
+              // setInterval(() => {
+              //   window.location.href = "/";
+              // }, 3000);
             }
             return;
           }
@@ -214,14 +223,21 @@ export class Game extends Phaser.Scene {
 
         // Check if rook reaches the vortex
         if (clickedRow === 7 && clickedCol === 0) {
-          alert("You Win! You reached the vortex before the other player.");
-          console.log(
-            "You Win! You reached the vortex before the other player."
-          );
           if (socketService.socket) gameService.endGame(socketService.socket);
-          setInterval(() => {
-            window.location.href = "/";
-          }, 3000);
+          showAlert(
+            "you win",
+            "You Win! You reached the vortex before the other player.",
+            () => {
+              setInterval(() => {
+                window.location.href = "/";
+              }, 1000);
+            }
+          );
+          // alert(".");
+          console.log("");
+          // setInterval(() => {
+          //   window.location.href = "/";
+          // }, 3000);
           return;
         }
       },

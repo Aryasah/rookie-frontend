@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client";
 import { useResetGame } from "../../utility";
+import { showAlert } from "../../utility/customAlert";
 
 class GameService {
   private timer: NodeJS.Timeout | null = null;
@@ -120,11 +121,15 @@ class GameService {
     // Implement logic for what happens when the timer ends
     socket.emit("game_end_due_to_timer"); // Example: Notify the server that the game ended due to the timer
     socket.disconnect();
-    alert("You ran out of time. You lose!");
+    showAlert("you loose","You ran out of time. You lose!",()=>{
+      setInterval(() => {
+        window.location.href = "/";
+      }, 1000);
+    });
     this.resetSocket(socket);
-    setInterval(() => {
-      window.location.href = "/";
-    }, 2000);
+    // setInterval(() => {
+    //   window.location.href = "/";
+    // }, 2000);
     return
   }
 

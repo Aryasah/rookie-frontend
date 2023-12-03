@@ -26,6 +26,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import CopyToClipboard from "react-copy-to-clipboard";
 import CustomButton from "../shared/customButton";
 import { toast } from "react-toastify";
+import { showAlert } from "../../utility/customAlert";
 
 export function Game() {
   const dispatch = useDispatch();
@@ -99,14 +100,14 @@ export function Game() {
       gameService.onGameWin(socketService.socket, (message: string,reason:string) => {
         console.log("Here gameWin", message,reason);
         dispatch(setPlayerTurn(false));
-        if(reason === "timer"){
-          alert("Opponent Timed Out!,you won the game");
-        }
-
         if (socketService?.socket) socketService.socket.disconnect();
-        setInterval(() => {
-          window.location.href = "/";
-        }, 2000);
+        if(reason === "timer"){
+          showAlert("you win","Opponent Timed Out!,you won the game",()=>{
+            setInterval(() => {
+              window.location.href = "/";
+            }, 1000);
+          });
+        }
       });
   };
 
