@@ -4,13 +4,16 @@ import gameContext from "../../gameContext";
 import { useDispatch, useSelector } from "react-redux";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
+import { checkGameState, isValidMove, useResetGame } from "../../utility";
 import {
-  checkGameState,
-  isValidMove,
-  updateGameMatrix,
-  useResetGame,
-} from "../../utility";
-import { IGameState, setGameStarted, setPlayerSymbol, setPlayerTurn, setRemainingTime, setRookPosition } from "../../redux/gameSlice";
+  IGameState,
+  setGameStarted,
+  setPlayerSymbol,
+  setPlayerTurn,
+  setRemainingTime,
+  setRookPosition,
+  updateGameState,
+} from "../../redux/gameSlice";
 
 export function Game() {
   // const {
@@ -41,9 +44,10 @@ export function Game() {
     if (!game.isPlayerTurn) return alert("Not your turn!");
     if (!isValidMove(game.rookPosition.x, game.rookPosition.y, row, column))
       return alert("Invalid Move!");
-    updateGameMatrix(column, row, game.playerSymbol, (turn) => {
-      dispatch(setPlayerTurn(turn));
-    });
+
+    dispatch(
+      updateGameState({ row: row, column: column, symbol: game.playerSymbol })
+    );
   };
 
   const handleGameUpdate = () => {
@@ -51,7 +55,6 @@ export function Game() {
       gameService.onGameUpdate(socketService.socket, (newGameState) => {
         console.log("Here", newGameState);
         dispatch(setRookPosition(newGameState.rookPosition));
-        // setRookPosition(newGameState.rookPosition);
         checkGameState(newGameState.rookPosition, game.playerSymbol);
         dispatch(setPlayerTurn(true));
       });
@@ -62,9 +65,7 @@ export function Game() {
       gameService.onStartGame(socketService.socket, 30, (options: any) => {
         const { message } = options; // Extract the 'message' property from 'options'
         console.log("Here handleGameStart", message);
-        // setGameStarted(true);
         dispatch(setGameStarted(true));
-        // setPlayerSymbol(options.symbol);
         dispatch(setPlayerSymbol(options.symbol));
         if (options.start) dispatch(setPlayerTurn(true));
         else dispatch(setPlayerTurn(false));

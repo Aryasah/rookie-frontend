@@ -1,4 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import socketService from "../services/socketService";
+import gameService from "../services/gameService";
+import { checkGameState } from "../utility";
 
 export interface IGameState {
   rookPosition: { x: number; y: number };
@@ -43,6 +46,31 @@ const gameSlice = createSlice({
     setRemainingTime: (state: IGameState, action: PayloadAction<number>) => {
       state.remainingTime = action.payload;
     },
+    updateGameState: (state, action: PayloadAction<{ column: number; row: number; symbol: 'x' | 'o' }>) => {
+        const { column, row, symbol } = action.payload;
+  
+        if (socketService.socket) {
+          gameService.updateGame(socketService.socket, {
+            rookPosition: { x: column, y: row },
+            symbol,
+          });
+  
+          const [currentPlayerWon, otherPlayerWon] = checkGameState({
+            x: column,
+            y: row,
+            symbol,
+          }, symbol);
+  
+          if (currentPlayerWon && otherPlayerWon) {
+            // game continues
+          } else if (currentPlayerWon && !otherPlayerWon) {
+            gameService.gameWin(socketService.socket, 'You Lost!');
+            alert('You Won!');
+          }
+  
+          state.isPlayerTurn = false;
+        }
+      },
   },
 });
 
@@ -53,6 +81,7 @@ export const {
   setPlayerTurn,
   setGameStarted,
   setRemainingTime,
+  updateGameState
 } = gameSlice.actions;
 
 export default gameSlice.reducer;
